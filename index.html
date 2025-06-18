@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Socket.IO chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+</head>
+
+<body>
+    <section class="bg-gray-50 flex-col flex items-center justify-center">
+        <div class="flex flex-col items-center gap-5">
+            <div class="flex flex-col items-center"><span class="text-5xl font-bold mt-16">Clollab<span
+                        class="text-blue-600">Docs</span></span>
+                <p class="mt-5 text-gray-300 font-bold">Live collaborative document editor for brainstorming</p>
+            </div>
+            <div class="flex gap-4"> <input id="code" type="text" placeholder="code"
+                    class="w-80 h-12 bg-white px-4 py-2 shadow-sm outline-none rounded-lg"><button id="join"
+                    class="font-bold bg-blue-500 text-white px-4 py-2 rounded-lg">Join</button></div>
+        </div>
+
+        <div class="w-[800px] h-screen mt-8 ">
+            <textarea id="editor" class="w-full h-[600px] bg-white px-4 py-2 resize-none shadow-lg outline-none"></textarea>
+        </div>
+    </section>
+
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    const socket = io();
+    let currentRoom = null;
+    
+    document.getElementById('join').addEventListener('click', () => {
+        currentRoom = document.getElementById('code').value;
+        socket.emit('join', currentRoom);
+    });
+    
+    document.getElementById('editor').addEventListener('input', (e) => {
+        if (currentRoom) {
+            socket.emit('code', currentRoom, e.target.value);
+        }
+    });
+
+    socket.on('code', content => {
+        if (document.getElementById('editor').value !== content) {
+            document.getElementById('editor').value = content;
+        }
+    });
+    </script>
+</body>
+
+</html>
